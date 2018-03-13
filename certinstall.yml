@@ -1,0 +1,17 @@
+- name: Certificate installation and auto update configuration
+  hosts: new
+  tasks:
+    - name: installing certificate
+      script: /etc/ansible/sc/certificate_install.sh
+    - name: copyng certificate auto udate script
+        - copy:
+            src: /etc/ansible/sc/certificate_autoupdate_cron.sh
+            dest: /root/certificate_autoupdate_cron.sh
+            mode: 0777
+    - name: Adding job to crontab
+        - cron:
+            name: "certificate update"
+            minute: "0"
+            hour: "0"
+            day: "1"
+            job: "root /root/certificate_autoupdate_cron.sh" 

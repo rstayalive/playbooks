@@ -1,0 +1,8 @@
+- name: copy file to remote host
+  hosts: testast
+  tasks:
+    - copy:
+       src: /etc/ansible/sc/somefile.bla
+       dest: /root/somefile.bla
+       owner: root
+       group: root

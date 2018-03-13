@@ -1,0 +1,10 @@
+- name: Starting reglament day
+  hosts: outsupport
+  tasks:
+    - name: Updating systems...
+      yum: name='*' state=latest
+    - name: Updating modules...
+      shell: fwconsole ma upgradeall
+    - name: Reloading asterisk. applying config.
+      shell: fwconsole reload
+

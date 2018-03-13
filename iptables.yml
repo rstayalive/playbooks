@@ -1,0 +1,215 @@
+- name: Iptables default security configuration
+  hosts: all
+  tasks:
+    - name: export current iptables rules
+      shell: iptables -S >> /root/iptables.rules
+    - name: stoping iptables  
+      shell: service iptables stop
+    - name: flushing all iptables rules
+      iptables:
+       flush: yes
+       
+    - name: allow loopback in interface traffic
+      iptables:
+       chain: INPUT
+       in_interface: lo
+       jump: ACCEPT
+       
+    - name: INVALID
+      iptables:
+       chain: INPUT
+       ctstate: INVALID 
+       jump: DROP
+       
+    - name: ESTABLISHED,RELATED
+      iptables:
+       chain: INPUT
+       ctstate: ESTABLISHED,RELATED
+       jump: ACCEPT
+
+    - name: allow loopback out interface traffic
+      iptables:
+       chain: OUTPUT
+       out_interface: lo
+       jump: ACCEPT
+       
+    - name: useragents
+      shell: "iptables -I INPUT -p udp --dport 5060 -m {{ item }}"
+      with_items:
+      - string --string "friendly-scanner" --algo bm -j DROP
+      - string --string "sip-scan" --algo bm -j DROP
+      - string --string "sundayddr" --algo bm -j DROP
+      - string --string "iWar" --algo bm -j DROP
+      - string --string "sipsak" --algo bm -j DROP
+      - string --string "sipvicious" --algo bm -j DROP
+      - string --string "sipcli" --algo bm -j DROP
+      - string --string "eyeBeam" --algo bm -j DROP
+      - string --string "VaxSIPUserAgent" --algo bm -j DROP
+      - string --string "sip:nm@nm" --algo bm -j DROP
+      - string --string "sip:carol@chicago.com" --algo bm -j DROP
+      - string --string "FPBX" --algo bm -j DROP
+      - string --string "Z 3.14.38765 rv2.8.3" --algo bm -j DROP
+       
+    - name: default web port allow
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       destination_port: 80
+       jump: ACCEPT
+
+    - name: ssl default port allow
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       destination_port: 443
+       jump: ACCEPT
+
+    - name: ssh default port allow
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       destination_port: 22
+       jump: ACCEPT
+
+    - name: allow SIP registration port
+      iptables:
+       chain: INPUT
+       protocol: udp
+       destination_port: 5060:5160
+       jump: ACCEPT
+
+    - name: allow RTP voice ports
+      iptables:
+       chain: INPUT
+       protocol: udp
+       destination_port: 10000:20000
+       jump: ACCEPT
+
+    - name: allow vedisoft prostie zvonki
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       destination_port: 10150:10151
+       jump: ACCEPT
+
+    - name: kurskhelp allow
+      iptables:
+       chain: INPUT
+       source: 176.192.230.26/32
+       jump: ACCEPT
+
+    - name: kurskhelp rezerv allow
+      iptables:
+       chain: INPUT
+       source: 213.176.233.0/24
+       jump: ACCEPT
+
+    - name: localnet exclude
+      iptables:
+       chain: INPUT
+       source: "{{ ansible_default_ipv4['network'] }}/24"
+       jump: ACCEPT
+   
+    - name: iptables -A INPUT -f -j DROP 
+      shell: iptables -A INPUT -f -j DROP
+    - name: iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+      shell: iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+      
+    - name: iptables flags ACK,RST,SYN,FIN INPUT
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       tcp_flags: flags="ALL" flags_set="ACK,RST,SYN,FIN"
+       jump: DROP
+       
+    - name: iptables flags SYN,FIN SYN,FIN INPUT
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       tcp_flags: flags="SYN,FIN" flags_set="SYN,FIN"
+       jump: DROP
+       
+    - name: iptables flags SYN,RST SYN,RST INPUT
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       tcp_flags: flags="SYN,RST" flags_set="SYN,RST"
+       jump: DROP
+       
+    - name: iptables flags ALL ALL INPUT
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       tcp_flags: flags="ALL" flags_set="ALL"
+       jump: DROP
+       
+    - name: iptables flags ALL NONE INPUT
+      iptables:
+       chain: INPUT
+       protocol: tcp
+       tcp_flags: flags="ALL" flags_set="NONE"
+       jump: DROP
+      
+  #  - name: geoip block
+   #   shell: iptables -I INPUT -m geoip ! --src-cc RU -j DROP
+
+    - name: INVALID
+      iptables:
+       chain: OUTPUT
+       ctstate: INVALID 
+       jump: DROP
+
+    - name: iptables -A OUTPUT -f -j DROP 
+      shell: iptables -A OUTPUT -f -j DROP
+    - name: iptables -A OUTPUT -p tcp ! --syn -m state --state NEW -j DROP
+      shell: iptables -A OUTPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+    - name: iptables flags ACK,RST,SYN,FIN OUTPUT
+      iptables:
+       chain: OUTPUT
+       protocol: tcp
+       tcp_flags: flags="ALL" flags_set="ACK,RST,SYN,FIN"
+       jump: DROP
+
+    - name: iptables flags SYN,FIN SYN,FIN OUTPUT
+      iptables:
+       chain: OUTPUT
+       protocol: tcp
+       tcp_flags: flags="SYN,FIN" flags_set="SYN,FIN"
+       jump: DROP
+
+    - name: iptables flags SYN,RST SYN,RST OUTPUT
+      iptables:
+       chain: OUTPUT
+       protocol: tcp
+       tcp_flags: flags="SYN,RST" flags_set="SYN,RST"
+       jump: DROP
+
+    - name: iptables flags ALL ALL OUTPUT
+      iptables:
+       chain: OUTPUT
+       protocol: tcp
+       tcp_flags: flags="ALL" flags_set="ALL"
+       jump: DROP
+
+    - name: iptables flags ALL NONE OUTPUT
+      iptables:
+       chain: OUTPUT
+       protocol: tcp
+       tcp_flags: flags="ALL" flags_set="NONE"
+       jump: DROP
+
+    - name: OUTPUT POLICY ACCEPT
+      iptables:
+       chain: OUTPUT
+       policy: ACCEPT
+       
+    - name: INPUT POLICY DROP
+      iptables:
+       chain: INPUT
+       policy: DROP
+       
+    - name: save and apply new rules
+      shell: service iptables save
+    - name: starting iptables service
+      shell: service iptables start

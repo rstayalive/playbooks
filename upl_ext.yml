@@ -1,0 +1,12 @@
+- name: Upload extensions and import to freepbx
+  hosts: testast
+  tasks:
+    - copy:
+       src: /etc/ansible/sc/ext_upload.csv
+       dest: /root/ext_upload.csv
+       owner: root
+       group: root
+    - name: importing process...
+      shell: fwconsole bulkimport /root/ext_upload.csv --type=extensions
+    - name: reloading...
+      shell: fwconsole reload

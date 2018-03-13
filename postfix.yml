@@ -1,0 +1,10 @@
+- name: Postifx configuration for new servers
+  hosts: new
+  tasks:
+    - name: installing mailx
+      yum: name='mailx' state=latest
+    - name: installing postfix server
+      yum: name='postfix' state=latest
+    - name: postfix configuration...
+      script: /etc/ansible/sc/postfixsetup.sh
+

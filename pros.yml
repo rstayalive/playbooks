@@ -1,0 +1,5 @@
+- name: Vedisoft installation
+  hosts: test
+  tasks:
+    - name: installing Vedisoft prostiezvonki
+      script: /etc/ansible/sc/prostiezvonki.sh

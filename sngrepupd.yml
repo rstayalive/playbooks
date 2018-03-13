@@ -1,0 +1,5 @@
+- name: upgrade sngrep
+  hosts: all
+  tasks:
+    - name: starting upgrade process
+      script: /etc/ansible/sc/sngrep.sh

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  name: updates
+  remote_user: root 
+ 
+  
+  tasks:
+    - name: Updating systems, please standby...
+      yum:  name='*' state=latest
